@@ -1,0 +1,62 @@
+# imports de blibliotecas e suas funcoes essenciais
+# = do selenium pra automatizacao, do pandas pra importacao de dados da planilha, e do webdriver do chrome pro acesso a ele)
+import time
+import pandas as pd
+import pyautogui
+import keyboard as k
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
+import os
+
+# config chrome (o abre maximizado)
+chrome_options = Options()
+chrome_options.add_argument("--start-maximized")  # Abre o navegador maximizado
+# chrome_options.add_argument("--headless") = add esta linha se quiser que o processo seja hide
+
+# inicia driver chrome
+service = Service(ChromeDriverManager().install())
+driver = webdriver.Chrome(service=service, options=chrome_options)
+
+# variavel pros dados de login
+url_login = "https://www.sccloud.com.br/smartbundy/index.php/S4/dashboard/view"
+usuario = "solon"
+senha = "solon1010"
+
+###################################################################################################################################################
+
+# acessa o url do sistema qualiex
+print("Acessando o sistema...")
+driver.get(url_login)
+
+WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "input-9")))
+print("Sistema acessado... Seguindo para Login...")
+
+# bota email
+print("Fazendo login...")
+driver.find_element(By.ID, "input-9").send_keys(usuario)
+print("Usuario colocado...")
+
+# bColoca a senha
+WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.NAME, "password")))
+driver.find_element(By.ID, "input-12").send_keys(senha)
+print("Senha também inserida...")
+
+botao_entrar = WebDriverWait(driver, 10).until(
+    EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Entrar') or contains(., ' Entrar ') or @type='submit']"))
+)
+url_antes = driver.current_url
+driver.execute_script("arguments[0].click();", botao_entrar)
+
+print("Site acessado com sucesso...")
+
+time.sleep(5)
+
+# indo p ponto
+print("Indo para área de Tratamento de Ponto...")
+driver.get("https://www.sccloud.com.br/smartbundy/index.php/FolhaPonto/tratamentoForm/_OBJ/mod_tratar_marcacoes/_SC_USER/solon")
+time.sleep(5)
