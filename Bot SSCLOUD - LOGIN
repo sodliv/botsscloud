@@ -58,24 +58,11 @@ driver.execute_script("arguments[0].click();", botao_entrar)
 
 print("Site acessado com sucesso...")
 
-time.sleep(5)
+time.sleep(2)
 
 # indo p ponto
 print("Indo para área de Tratamento de Ponto...")
 driver.get("https://www.sccloud.com.br/smartbundy/index.php/FolhaPonto/tratamentoForm/_OBJ/mod_tratar_marcacoes/_SC_USER/solon")
-
-time.sleep(2)
-
-html = driver.page_source
-print(f"Tamanho do HTML: {len(html)} caracteres")
-
-with open(r"C:\Users\smlima\Desktop\pagina_tratamento.html", "w", encoding="utf-8") as f:
-    f.write(html)
-
-print("Arquivo pagina_tratamento.html salvo na área de trabalho.")
-
-
-time.sleep(3)
 
 ###################################################################################################################################################
 
@@ -99,13 +86,13 @@ for index, row in df.iterrows():
 
     try:
         # (1: Preenchendo a data do atestado)
-        campo_data1 = WebDriverWait(driver, 10).until(
+        campo_data1 = WebDriverWait(driver, 5).until(
             EC.presence_of_element_located((By.ID, "data_inicial"))
         )
         campo_data1.clear()
         campo_data1.send_keys(data_str)
 
-        campo_data2 = WebDriverWait(driver, 10).until(
+        campo_data2 = WebDriverWait(driver, 5).until(
             EC.presence_of_element_located((By.ID, "data_final"))
         )
         campo_data2.clear()
@@ -124,15 +111,16 @@ for index, row in df.iterrows():
 
         # (3: Apertando botão para seleção de colaborador)
         botao_pesquisar = webdriver(driver, 5).until(
-            EC.presence_of_element_located((By.))
-
+            EC.element_to_be_clickable((By.XPATH, "//input[@value='Pesquisar']"))
         )
+        botao_pesquisar.click()
 
-
+        if botao_pesquisar:
+            print ("Botão pesquisar achado! 😃")
+            continue
+        if not botao_pesquisar:
+            print ("Botão pesquisar não achado. 😥")
+            break
 
     except Exception as e:    
-        print(f"✔ Erro ao achar campo para colocar '{data}'.")
-
-
-
-Pesquisar
+        print(f"✔ Erro.")
