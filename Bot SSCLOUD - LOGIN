@@ -98,6 +98,7 @@ for index, row in df.iterrows():
     print(f"\nSelecionando: {data}...")
 
     try:
+        # (1: Preenchendo a data do atestado)
         campo_data1 = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, "data_inicial"))
         )
@@ -110,8 +111,28 @@ for index, row in df.iterrows():
         campo_data2.clear()
         campo_data2.send_keys(data_str)
 
-        print(f"✔ Registro do dia '{data}' selecionado! Prosseguindo...")
+        print(f"✔ Registro do dia '{data}' conforme prescrito no devido atestado selecionado! Prosseguindo...")
+
+        # (2: Preenchendo o nome do colaborador)
+        campo_filtro = WebDriverWait(driver, 5).until(
+            EC.presence_of_element_located((By.ID, '_colaborador_filtro'))
+        )
+        campo_filtro.clear()
+        campo_filtro.send_keys(nome)
+        print(f"✔ Colaborador '{nome}' também selecionado com sucesso! Ainda prosseguindo...")
+        time.sleep(10)
+
+        # (3: Apertando botão para seleção de colaborador)
+        botao_pesquisar = webdriver(driver, 5).until(
+            EC.presence_of_element_located((By.))
+
+        )
+
+
 
     except Exception as e:    
         print(f"✔ Erro ao achar campo para colocar '{data}'.")
-        continue
+
+
+
+Pesquisar
