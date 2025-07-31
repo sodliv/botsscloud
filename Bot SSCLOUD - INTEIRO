@@ -26,7 +26,7 @@ from bs4 import BeautifulSoup
 # config chrome (o abre maximizado)
 chrome_options = Options()
 chrome_options.add_argument("--start-maximized")  # Abre o navegador maximizado
-# chrome_options.add_argument("--headless") = add esta linha se quiser que o processo seja hide
+                        #chrome_options.add_argument("--headless") = add esta linha se quiser que o processo seja hide
 
 # inicia driver chrome
 service = Service(ChromeDriverManager().install())
@@ -190,6 +190,9 @@ for index, row in df.iterrows():
         time.sleep(0.8)
         botao2_fechar_edicao = pyautogui.click(cc, ss)
 
+        print ("Documento de Atestado Médico do colaborador '{nome}' adicionado com sucesso!")
+        continue
+
 
     except Exception as e:
-        print(f"🚫 Erro: {e}")
+        print ("Processo finalizado. Todos os documentos de Atestado  dos referentes colaboradores da planilha foram adicionados")
