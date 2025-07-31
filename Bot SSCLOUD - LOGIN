@@ -15,6 +15,11 @@ import os
 import warnings
 from selenium.webdriver import ActionChains
 warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl")
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from bs4 import BeautifulSoup
+
 
 ###################################################################################################################################################
 
@@ -36,20 +41,20 @@ senha = "solon1010"
 
 # acessa o url do sistema sscloud
 driver.get(url_login)
-print("Acessando o sistema...")
+print("⏰: Acessando o sistema...")
 
 WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "input-9")))
-print("Sistema acessado... Seguindo para Login...")
+print("✅: Site acessado. Seguindo para Login...")
 
 # bota usuario
 print("Fazendo login...")
 teste = driver.find_element(By.ID, "input-9").send_keys(usuario)
-print("Usuario colocado...")
+print("✅: Usuario colocado.")
 
 # bColoca a senha
 WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.NAME, "password")))
 driver.find_element(By.ID, "input-12").send_keys(senha)
-print("Senha também inserida...")
+print("✅: Senha inserida.")
 
 botao_entrar = WebDriverWait(driver, 10).until(
     EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Entrar') or contains(., ' Entrar ') or @type='submit']"))
@@ -57,7 +62,7 @@ botao_entrar = WebDriverWait(driver, 10).until(
 url_antes = driver.current_url
 driver.execute_script("arguments[0].click();", botao_entrar)
 
-print("Site acessado com sucesso...")
+print("✅: Sistema acessado com sucesso. Prosseguindo para sua edição... ")
 
 time.sleep(2)
 
@@ -103,7 +108,7 @@ for index, row in df.iterrows():
         campo_data2.clear()
         campo_data2.send_keys(data_str)
 
-        print(f"✔ Registro do dia '{data}' conforme prescrito no devido atestado selecionado! Prosseguindo...")
+        print(f"✅: Registro do dia '{data}' conforme prescrito no devido atestado selecionado! Prosseguindo...")
 
         # (2: Preenchendo o nome do colaborador)
         campo_filtro = WebDriverWait(driver, 5).until(
@@ -111,7 +116,7 @@ for index, row in df.iterrows():
         )
         campo_filtro.clear()
         campo_filtro.send_keys(nome)
-        print(f"✔ Colaborador '{nome}' também selecionado com sucesso! Ainda prosseguindo...")
+        print(f"✅: Colaborador '{nome}' também selecionado com sucesso! Ainda prosseguindo...")
 
         # (3: Apertando botão para seleção de colaborador)
         botao_pesquisar = WebDriverWait(driver, 5).until(
@@ -119,8 +124,72 @@ for index, row in df.iterrows():
         )
         actions = ActionChains(driver)
         actions.move_to_element(botao_pesquisar).click().perform()
-        time.sleep(5)
+        time.sleep(2)
+        print(f"📌 Adentrando na edição do colaborador '{nome}'...")
+
+
+        # (4: Clicando em "Lancar atestados/ausencias)
+        a, b = 503, 803 # coordenada do botão em questão
+        botao_lancar = pyautogui.click(a, b)
+        time.sleep(2)
+        print(f"📌 Acessando o Tratamento de Ausências de'{nome}'...")
+        
+        # (5: Clicando no segundo campo referente a data do atestado)
+        c, d = 215, 480 # coordenada do campo 1
+        e, f = 296, 480 # coordenada do campo 2
+
+        campo_data_inicio = pyautogui.click(c, d)
+        time.sleep(1)
+        pyautogui.write(data_str)
+        time.sleep(1)
+        campo_data_fim = pyautogui.click(e, f)
+        time.sleep(1)
+        pyautogui.write(data_str)
+        time.sleep(1)
+        
+        print(f"📌 Colocando a respectiva data do documento de Atestado Médico em questão do colaborador '{nome}'...")
+ 
+        # (6: Escolhendo o motivo de ausência)
+        # clicando em botão:
+        g, h = 645, 480 # coordenada do botão de motivo
+        botao_motivo = pyautogui.click(g, h)
+        0,5
+        # esoclhendo motivo:
+        i, j = 622, 61
+        kk, l = 633, 300
+        m, n = 633, 327
+        o, p = 682, 348
+        if motivo == 'Abono Legal':
+            opcao_abono_legal = pyautogui.click(i,j)
+        elif motivo == 'Atestado (ausência parcial)':
+            opcao_atestado_parcial = pyautogui.click(kk, l)
+        elif motivo == 'Atestado (dia inteiro)':
+            opcao_atestado_inteiro = pyautogui.click(m, n)
+        elif motivo == 'Abona DSR':
+            opcao_abono_dr =pyautogui.click(o, p)
+        else:
+            print ("Motivo não existente.")
+        time.sleep(1)
+
+        # (7: Salvando alterações)
+        q, r = 673, 570
+        s, t = 1297, 473
+        u, v = 619, 556
+        y, z = 1343, 254
+        cc, ss = 1387, 185
+
+        rolar_tela = pyautogui.click(q, r)
+        time.sleep(0.8)
+        k.press_and_release('right')
+        time.sleep(0.8)
+        botao_salvar = pyautogui.click(s, t)
+        time.sleep(0.8)
+        botao_salvar_confirmacao_ok = pyautogui.click(u, v)
+        time.sleep(0.8)
+        botao1_fechar_edicao = pyautogui.click(y, z)
+        time.sleep(0.8)
+        botao2_fechar_edicao = pyautogui.click(cc, ss)
+
 
     except Exception as e:
-            print(f"✔ Erro: {e}")
-
+        print(f"🚫 Erro: {e}")
