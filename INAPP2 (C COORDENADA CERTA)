@@ -55,13 +55,14 @@ def processar_planilha(caminho_excel):
 
     print("Carregando dados da planilha...")
     df = pd.read_excel(caminho_excel)  # usa o caminho recebido!
+    print(df.columns)  # Veja os nomes exatos das colunas
 
     df['Data'] = pd.to_datetime(df['Data'], errors='coerce')
-
+   
     for index, row in df.iterrows():
         nome = row['Nome']
 
-        data = row['Data1']
+        data = row['Data']
         if pd.notnull(data):
             data_str = data.strftime('%d/%m/%Y')
         else:
@@ -69,89 +70,95 @@ def processar_planilha(caminho_excel):
 
         motivo = row['Motivo']
 
+        validacao = row['Validacao']
+
+
         print(f"\nSelecionando: {data}...")
 
-        try:
-            campo_data1 = WebDriverWait(driver, 5).until(
-                EC.presence_of_element_located((By.ID, "data_inicial"))
-            )
-            campo_data1.clear()
-            campo_data1.send_keys(data_str)
+        print(f"[DEBUG] Linha {index}: Nome={nome}, Validação={validacao}")
+        if str(validacao).strip().upper() == 'N':
+            try:
+                campo_data1 = WebDriverWait(driver, 5).until(
+                    EC.presence_of_element_located((By.ID, "data_inicial"))
+                )
+                campo_data1.clear()
+                campo_data1.send_keys(data_str)
 
-            campo_data2 = WebDriverWait(driver, 5).until(
-                EC.presence_of_element_located((By.ID, "data_final"))
-            )
-            campo_data2.clear()
-            campo_data2.send_keys(data_str)
+                campo_data2 = WebDriverWait(driver, 5).until(
+                    EC.presence_of_element_located((By.ID, "data_final"))
+                )
+                campo_data2.clear()
+                campo_data2.send_keys(data_str)
 
-            print(f"✅: Registro do dia '{data}' conforme prescrito no devido atestado selecionado! Prosseguindo...")
+                print(f"✅: Registro do dia '{data}' conforme prescrito no devido atestado selecionado! Prosseguindo...")
 
-            campo_filtro = WebDriverWait(driver, 5).until(
-                EC.presence_of_element_located((By.ID, '_colaborador_filtro'))
-            )
-            campo_filtro.clear()
-            campo_filtro.send_keys(nome)
-            print(f"✅: Colaborador '{nome}' também selecionado com sucesso! Ainda prosseguindo...")
+                campo_filtro = WebDriverWait(driver, 5).until(
+                    EC.presence_of_element_located((By.ID, '_colaborador_filtro'))
+                )
+                campo_filtro.clear()
+                campo_filtro.send_keys(nome)
+                print(f"✅: Colaborador '{nome}' também selecionado com sucesso! Ainda prosseguindo...")
 
-            botao_pesquisar = WebDriverWait(driver, 5).until(
-                EC.element_to_be_clickable((By.XPATH, '//*[@id="pesquisar"]/input'))
-            )
-            actions = ActionChains(driver)
-            actions.move_to_element(botao_pesquisar).click().perform()
-            time.sleep(8)
-            print(f"📌 Adentrando na edição do colaborador '{nome}'...")
+                botao_pesquisar = WebDriverWait(driver, 5).until(
+                    EC.element_to_be_clickable((By.XPATH, '//*[@id="pesquisar"]/input'))
+                )
+                actions = ActionChains(driver)
+                actions.move_to_element(botao_pesquisar).click().perform()
+                time.sleep(8)
+                print(f"📌 Adentrando na edição do colaborador '{nome}'...")
 
-            pyautogui.click(524, 669)
-            time.sleep(2)
-            print(f"📌 Acessando o Tratamento de Ausências de '{nome}'...")
+                pyautogui.click(524, 669)
+                time.sleep(2)
+                print(f"📌 Acessando o Tratamento de Ausências de '{nome}'...")
 
-            pyautogui.click(198, 481)
-            time.sleep(1)
-            pyautogui.write(data_str)
-            time.sleep(1)
-            pyautogui.click(296, 483)
-            time.sleep(1)
-            pyautogui.write(data_str)
-            time.sleep(1)
+                pyautogui.click(198, 481)
+                time.sleep(1)
+                pyautogui.write(data_str)
+                time.sleep(1)
+                pyautogui.click(296, 483)
+                time.sleep(1)
+                pyautogui.write(data_str)
+                time.sleep(1)
 
-            print(f"📌 Colocando a respectiva data do documento de Atestado Médico em questão do colaborador '{nome}'...")
+                print(f"📌 Colocando a respectiva data do documento de Atestado Médico em questão do colaborador '{nome}'...")
 
-            pyautogui.click(600, 488)
-            time.sleep(1)
+                pyautogui.click(600, 488)
+                time.sleep(1)
 
-            if motivo == 'Abono Legal':
-                pyautogui.click(618, 63)
-            elif motivo == 'Atestado (ausência parcial)':
-                pyautogui.click(674, 300)
-            elif motivo == 'Atestado (dia inteiro)':
-                pyautogui.click(674, 324)
-            elif motivo == 'Abona DSR':
-                pyautogui.click(695, 350)
-            else:
-                print("Motivo não existente.")
-            time.sleep(1)
+                if motivo == 'Abono Legal':
+                    pyautogui.click(618, 63)
+                elif motivo == 'Atestado (ausência parcial)':
+                    pyautogui.click(674, 300)
+                elif motivo == 'Atestado (dia inteiro)':
+                    pyautogui.click(674, 324)
+                elif motivo == 'Abona DSR':
+                    pyautogui.click(695, 350)
+                else:
+                    print("Motivo não existente.")
+                time.sleep(1)
 
-            pyautogui.click(737, 553)
-            time.sleep(1)
-            k.press_and_release('right')
-            time.sleep(0.3)
-            k.press_and_release('right')
-            time.sleep(0.3)
-            k.press_and_release('right')
-            time.sleep(1)
-            pyautogui.click(1226, 475)
-            time.sleep(0.1)
-            pyautogui.click(1218, 474)
-            time.sleep(3)
-            pyautogui.click(600, 489)
-            time.sleep(5)
-            pyautogui.click(1267, 251)
-            time.sleep(5)
-            pyautogui.click(1315, 185)
+                pyautogui.click(737, 553)
+                time.sleep(1)
+                k.press_and_release('right')
+                time.sleep(0.3)
+                k.press_and_release('right')
+                time.sleep(0.3)
+                k.press_and_release('right')
+                time.sleep(1)
+                pyautogui.click(1226, 475)
+                time.sleep(0.1)
+                pyautogui.click(1218, 474)
+                time.sleep(3)
+                pyautogui.click(600, 489)
+                time.sleep(5)
+                pyautogui.click(1267, 251)
+                time.sleep(5)
+                pyautogui.click(1315, 185)
 
-            print(f"Documento de Atestado Médico do colaborador '{nome}' adicionado com sucesso!")
+                print(f"Documento de Atestado Médico do colaborador '{nome}' adicionado com sucesso!")
 
-        except Exception as e:
-            print(f"Erro no processamento do colaborador '{nome}': {e}")
-
+            except Exception as e:
+                print(f"Erro no processamento do colaborador '{nome}': {e}")
+        else:
+            print("Não há colaborador com Documento de Atestado Médico para ser atualizado.")
     print("Processo finalizado. Todos os documentos da planilha foram processados.")
