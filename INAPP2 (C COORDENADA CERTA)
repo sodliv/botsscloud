@@ -61,7 +61,7 @@ def processar_planilha(caminho_excel):
     for index, row in df.iterrows():
         nome = row['Nome']
 
-        data = row['Data']
+        data = row['Data1']
         if pd.notnull(data):
             data_str = data.strftime('%d/%m/%Y')
         else:
@@ -117,7 +117,7 @@ def processar_planilha(caminho_excel):
             print(f"📌 Colocando a respectiva data do documento de Atestado Médico em questão do colaborador '{nome}'...")
 
             pyautogui.click(600, 488)
-            time.sleep(0.5)
+            time.sleep(1)
 
             if motivo == 'Abono Legal':
                 pyautogui.click(618, 63)
@@ -132,15 +132,21 @@ def processar_planilha(caminho_excel):
             time.sleep(1)
 
             pyautogui.click(737, 553)
-            time.sleep(0.8)
+            time.sleep(1)
             k.press_and_release('right')
-            time.sleep(0.8)
+            time.sleep(0.3)
+            k.press_and_release('right')
+            time.sleep(0.3)
+            k.press_and_release('right')
+            time.sleep(1)
             pyautogui.click(1226, 475)
-            time.sleep(0.8)
+            time.sleep(0.1)
+            pyautogui.click(1218, 474)
+            time.sleep(3)
             pyautogui.click(600, 489)
-            time.sleep(0.8)
+            time.sleep(5)
             pyautogui.click(1267, 251)
-            time.sleep(0.8)
+            time.sleep(5)
             pyautogui.click(1315, 185)
 
             print(f"Documento de Atestado Médico do colaborador '{nome}' adicionado com sucesso!")
