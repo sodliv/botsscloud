@@ -1,0 +1,151 @@
+def processar_planilha(caminho_excel):
+    import time
+    import pandas as pd
+    import pyautogui
+    import keyboard as k
+    from selenium import webdriver
+    from selenium.webdriver.chrome.service import Service
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+    from webdriver_manager.chrome import ChromeDriverManager
+    from selenium.webdriver import ActionChains
+    import warnings
+    warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl")
+
+    # config chrome
+    chrome_options = Options()
+    chrome_options.add_argument("--start-maximized")
+
+    # inicia driver chrome
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+
+    # variaveis login e url
+    url_login = "https://www.sccloud.com.br/smartbundy/index.php/S4/dashboard/view"
+    usuario = "solon"
+    senha = "solon1010"
+
+    driver.get(url_login)
+    print("⏰: Acessando o sistema...")
+
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "input-9")))
+    print("✅: Site acessado. Seguindo para Login...")
+
+    print("Fazendo login...")
+    driver.find_element(By.ID, "input-9").send_keys(usuario)
+    print("✅: Usuario colocado.")
+
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.NAME, "password")))
+    driver.find_element(By.ID, "input-12").send_keys(senha)
+    print("✅: Senha inserida.")
+
+    botao_entrar = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Entrar') or contains(., ' Entrar ') or @type='submit']"))
+    )
+    driver.execute_script("arguments[0].click();", botao_entrar)
+
+    print("✅: Sistema acessado com sucesso. Prosseguindo para sua edição... ")
+
+    time.sleep(2)
+
+    print("Indo para área de Tratamento de Ponto...")
+    driver.get("https://www.sccloud.com.br/smartbundy/index.php/FolhaPonto/tratamentoForm/_OBJ/mod_tratar_marcacoes/_SC_USER/solon")
+
+    print("Carregando dados da planilha...")
+    df = pd.read_excel(caminho_excel)  # usa o caminho recebido!
+
+    df['Data'] = pd.to_datetime(df['Data'], errors='coerce')
+
+    for index, row in df.iterrows():
+        nome = row['Nome']
+
+        data = row['Data']
+        if pd.notnull(data):
+            data_str = data.strftime('%d/%m/%Y')
+        else:
+            data_str = ''
+
+        motivo = row['Motivo']
+
+        print(f"\nSelecionando: {data}...")
+
+        try:
+            campo_data1 = WebDriverWait(driver, 5).until(
+                EC.presence_of_element_located((By.ID, "data_inicial"))
+            )
+            campo_data1.clear()
+            campo_data1.send_keys(data_str)
+
+            campo_data2 = WebDriverWait(driver, 5).until(
+                EC.presence_of_element_located((By.ID, "data_final"))
+            )
+            campo_data2.clear()
+            campo_data2.send_keys(data_str)
+
+            print(f"✅: Registro do dia '{data}' conforme prescrito no devido atestado selecionado! Prosseguindo...")
+
+            campo_filtro = WebDriverWait(driver, 5).until(
+                EC.presence_of_element_located((By.ID, '_colaborador_filtro'))
+            )
+            campo_filtro.clear()
+            campo_filtro.send_keys(nome)
+            print(f"✅: Colaborador '{nome}' também selecionado com sucesso! Ainda prosseguindo...")
+
+            botao_pesquisar = WebDriverWait(driver, 5).until(
+                EC.element_to_be_clickable((By.XPATH, '//*[@id="pesquisar"]/input'))
+            )
+            actions = ActionChains(driver)
+            actions.move_to_element(botao_pesquisar).click().perform()
+            time.sleep(2)
+            print(f"📌 Adentrando na edição do colaborador '{nome}'...")
+
+            pyautogui.click(503, 803)
+            time.sleep(2)
+            print(f"📌 Acessando o Tratamento de Ausências de '{nome}'...")
+
+            pyautogui.click(215, 480)
+            time.sleep(1)
+            pyautogui.write(data_str)
+            time.sleep(1)
+            pyautogui.click(296, 480)
+            time.sleep(1)
+            pyautogui.write(data_str)
+            time.sleep(1)
+
+            print(f"📌 Colocando a respectiva data do documento de Atestado Médico em questão do colaborador '{nome}'...")
+
+            pyautogui.click(645, 480)
+            time.sleep(0.5)
+
+            if motivo == 'Abono Legal':
+                pyautogui.click(622, 61)
+            elif motivo == 'Atestado (ausência parcial)':
+                pyautogui.click(633, 300)
+            elif motivo == 'Atestado (dia inteiro)':
+                pyautogui.click(633, 327)
+            elif motivo == 'Abona DSR':
+                pyautogui.click(682, 348)
+            else:
+                print("Motivo não existente.")
+            time.sleep(1)
+
+            pyautogui.click(673, 570)
+            time.sleep(0.8)
+            k.press_and_release('right')
+            time.sleep(0.8)
+            pyautogui.click(1297, 473)
+            time.sleep(0.8)
+            pyautogui.click(619, 556)
+            time.sleep(0.8)
+            pyautogui.click(1343, 254)
+            time.sleep(0.8)
+            pyautogui.click(1387, 185)
+
+            print(f"Documento de Atestado Médico do colaborador '{nome}' adicionado com sucesso!")
+
+        except Exception as e:
+            print(f"Erro no processamento do colaborador '{nome}': {e}")
+
+    print("Processo finalizado. Todos os documentos da planilha foram processados.")
